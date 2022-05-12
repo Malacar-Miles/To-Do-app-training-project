@@ -1,0 +1,115 @@
+body {
+  margin: 0;
+  background-color: black;
+  font-family: Handlee, arial;
+  --color-yellow-page: #f4eb90;
+  --color-grey-line: #ccc68a;
+  --color-brown-line: #d6a45d;
+  --cell-height: 24px;
+  --cell-border: 2px; /* Must be an even number */
+  --cell-half-border: calc(var(--cell-border) / 2);
+  --cell-total-height: calc(var(--cell-height) + var(--cell-border));
+  --shadow: none; /* drop-shadow(2px 2px 2px var(--color-grey-line)); */
+}
+
+div.wrapper {
+  width: 375px;
+  max-width: 100%;
+  margin: 0 auto;
+}
+
+header {
+  background-color: var(--color-yellow-page);
+  width: 100%;
+  height: 50px;
+}
+
+h1 {
+  text-align: center;
+  padding-top: 14px;
+  filter: var(--shadow);
+}
+
+main {
+  min-height: 496px;
+  background-color: var(--color-yellow-page);
+  /* Draw horizontal cells separated by lines using the colors
+  and dimensions set by variables */
+  background: repeating-linear-gradient(var(--color-grey-line) 0 var(--cell-border),
+              var(--color-yellow-page) var(--cell-border) var(--cell-total-height));
+}
+
+div.cell {
+  padding-top: 1px;
+  padding-left: 30px;
+  height: var(--cell-total-height);
+  border-top: var(--cell-half-border) solid transparent;
+  border-bottom: var(--cell-half-border) solid transparent;
+  display: flex;
+  align-items: center;
+  overflow: hidden;
+}
+
+div.task {
+  pointer-events: none;
+}
+
+div.task span {
+  align-self: flex-end;
+}
+
+div.task:before {
+  content: "";
+  display: block;
+  height: 20px;
+  width: 20px;
+  border: 1px solid black;
+  border-radius: 10px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin-right: 10px;
+  cursor: pointer;
+  pointer-events: all;
+}
+
+div.completed span {
+  text-decoration: line-through;
+}
+
+div.completed:before {
+  content: "\2713";
+  font-weight: bold;
+  font-size: 14px;
+}
+
+button {
+  cursor: pointer;
+  filter: var(--shadow);
+}
+
+button#add-task {
+  font-weight: bold;
+  background-color: transparent;
+  border: 1px solid black;
+  height: 20px;
+  width: 20px;
+  border-radius: 10px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin-right: 10px;
+}
+
+input#task-input {
+  background-color: transparent;
+  border: none;
+  align-self: flex-end;
+}
+
+input#task-input:focus {
+  background-color: transparent;
+  outline: none;
+  border: 1px solid black;
+  border-radius: 4px;
+}
