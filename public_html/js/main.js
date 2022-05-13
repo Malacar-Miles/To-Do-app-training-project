@@ -18,23 +18,31 @@ function Task(inputText) { // A constructor function for task objects
 
 // Create an HTML element for the task and add it to the container
 function createDiv(displayText, fullText) {
-  const newDiv = document.createElement("div");
-  newDiv.classList.add("cell");
-  newDiv.classList.add("task");
-  newDiv.innerHTML = displayText === fullText
-              ? `<span>${displayText}</span>` // if displayText is same as fullText, create HTML without a tooltip
-              : `<span class="tooltip">${displayText}<span class="tooltip-text">${fullText}</span></span>`; // else create HTML that will show fullText in a tooltip
-  tasksContainer.appendChild(newDiv);
-  newDiv.onclick = function() {
+  const newTaskCell = document.createElement("div");
+  const newTaskCheckmark = document.createElement("div");
+  const newTaskText = document.createElement("span");
+  newTaskCell.classList.add("cell");
+  newTaskCell.classList.add("task");
+  newTaskCheckmark.classList.add("checkmark");
+  newTaskCheckmark.innerHTML = "<p>&check;</p>"; // &check; is a checkmark symbol;
+  newTaskText.classList.add("tooltip");
+  newTaskText.innerHTML = displayText === fullText
+              ? displayText // if displayText is same as fullText, create HTML without a tooltip
+              : `${displayText}<span class="tooltip-text">${fullText}</span>`; // else create HTML that will show fullText in a tooltip
+  newTaskCell.appendChild(newTaskCheckmark);
+  newTaskCell.appendChild(newTaskText);
+  tasksContainer.appendChild(newTaskCell);
+  newTaskCheckmark.onclick = function() {
     // Toggle the "Completed" state for the element
-    this.classList.toggle("completed");
+    const taskCell = this.parentElement;
+    taskCell.classList.toggle("completed");
     // Update the isCompleted field in the array item that corresponds to this element
-    if (this.classList.contains("completed"))
-      tasks[getTaskIndex(this)].isCompleted = true;
+    if (taskCell.classList.contains("completed"))
+      tasks[getTaskIndex(taskCell)].isCompleted = true;
     else
-      tasks[getTaskIndex(this)].isCompleted = false;
+      tasks[getTaskIndex(taskCell)].isCompleted = false;
   };
-  return newDiv;
+  return newTaskCell;
 }
 
 // Create a new task when the input field loses focus (if the field is not empty)
