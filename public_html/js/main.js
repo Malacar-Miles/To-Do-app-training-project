@@ -8,25 +8,33 @@ function Task(inputText) { // A constructor function for task objects
   this.fullText = inputText;
   if (inputText.length > maxLength) {
     // Truncate the display text so it fits the screen
-    // Turn the string into an array of words, than add words from the array into a new string until maxLength is exceeded
+    // Turn the string into an array of words, then add words from this array into a new string until maxLength is exceeded
     this.displayText = inputText.split(" ").reduce((a, b) => (a.length + b.length <= maxLength) ? a + " " + b : a, "");
     this.displayText += "…"; // Add an ellipsis at the end
     } else this.displayText = inputText;
   this.isCompleted = false;
-  
-  // Create an HTML element for the task and add it to the container
-  function createDiv(displayText) {
-    const newDiv = document.createElement("div");
-    newDiv.classList.add("cell");
-    newDiv.classList.add("task");
-    newDiv.innerHTML = `<span>${displayText}</span>`;
-    tasksContainer.appendChild(newDiv);
-    newDiv.onclick = function() { // Toggle the "Completed" state on click
-      this.classList.toggle("completed");
-    };
-    return newDiv;
-  }
-  this.htmlElement = createDiv(this.displayText);
+  this.htmlElement = createDiv(this.displayText, this.fullText);
+}
+
+// Create an HTML element for the task and add it to the container
+function createDiv(displayText, fullText) {
+  const newDiv = document.createElement("div");
+  newDiv.classList.add("cell");
+  newDiv.classList.add("task");
+  newDiv.innerHTML = displayText === fullText
+              ? `<span>${displayText}</span>` // if displayText is same as fullText, create HTML without a tooltip
+              : `<span class="tooltip">${displayText}<span class="tooltip-text">${fullText}</span></span>`; // else create HTML that will show fullText in a tooltip
+  tasksContainer.appendChild(newDiv);
+  newDiv.onclick = function() {
+    // Toggle the "Completed" state for the element
+    this.classList.toggle("completed");
+    // Update the isCompleted field in the array item that corresponds to this element
+    if (this.classList.contains("completed"))
+      tasks[getTaskIndex(this)].isCompleted = true;
+    else
+      tasks[getTaskIndex(this)].isCompleted = false;
+  };
+  return newDiv;
 }
 
 // Create a new task when the input field loses focus (if the field is not empty)
@@ -49,3 +57,13 @@ addTaskButton.addEventListener("click", function() {
   addTaskInput.focus();
 });
 
+// Take a reference to a DOM element and find the corresponding index of a task in the global "tasks" array
+function getTaskIndex(element) {
+  var result = -1;
+  for (let i = 0; i < tasks.length; i++)
+    if (tasks[i].htmlElement === element) {
+      result = i;
+      break;
+    }
+  return result;
+}
