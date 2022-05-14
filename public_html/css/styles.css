@@ -32,6 +32,10 @@ h1 {
   filter: var(--text-shadow);
 }
 
+hr {
+  border: 1px solid var(--color-brown-line);
+  border-radius: 1px;
+}
 main {
   min-height: 486px;
   background-color: var(--color-yellow-page);
@@ -53,10 +57,6 @@ div.cell {
   user-select: none;
 }
 
-div.task {
-  
-}
-
 div.task span {
   align-self: flex-end;
 }
@@ -75,7 +75,7 @@ div.checkmark {
   cursor: pointer;
 }
 
-div.completed span {
+div.completed > span {
   text-decoration: line-through;
 }
 
