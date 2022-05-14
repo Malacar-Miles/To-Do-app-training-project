@@ -2,7 +2,7 @@ var tasks = []; // The array that will hold all task objects
 const addTaskButton = document.getElementById("add-task"); // HTML element for the Add Task button
 const addTaskInput = document.getElementById("task-input"); // HTML element for the input text
 const tasksContainer = document.getElementById("tasks-container"); // A <div> that will contain all the tasks
-const maxLength = 30; // Maximum amount of characters to be displayed for each task
+const maxLength = 35; // Maximum amount of characters to be displayed for each task
 
 function Task(inputText) { // A constructor function for task objects
   this.fullText = inputText;
@@ -13,25 +13,33 @@ function Task(inputText) { // A constructor function for task objects
     this.displayText += "…"; // Add an ellipsis at the end
     } else this.displayText = inputText;
   this.isCompleted = false;
-  this.htmlElement = createDiv(this.displayText, this.fullText);
+  this.htmlElement = createCell(this.displayText, this.fullText);
 }
 
 // Create an HTML element for the task and add it to the container
-function createDiv(displayText, fullText) {
+function createCell(displayText, fullText) {
+  // Create new HTML elements that we'll use to construct the task cell
   const newTaskCell = document.createElement("div");
   const newTaskCheckmark = document.createElement("div");
   const newTaskText = document.createElement("span");
+  const newTaskDeleteButton = document.createElement("div");
+  // Set their classes and innerHTML
   newTaskCell.classList.add("cell");
   newTaskCell.classList.add("task");
+  newTaskDeleteButton.classList.add("delete-button");
+  newTaskDeleteButton.innerHTML = "X";
   newTaskCheckmark.classList.add("checkmark");
   newTaskCheckmark.innerHTML = "<p>&check;</p>"; // &check; is a checkmark symbol;
   newTaskText.classList.add("tooltip");
   newTaskText.innerHTML = displayText === fullText
               ? displayText // if displayText is same as fullText, create HTML without a tooltip
               : `${displayText}<span class="tooltip-text">${fullText}</span>`; // else create HTML that will show fullText in a tooltip
+  // Append each component to the new cell, then append the new cell to the tasks container
   newTaskCell.appendChild(newTaskCheckmark);
   newTaskCell.appendChild(newTaskText);
+  newTaskCell.appendChild(newTaskDeleteButton);
   tasksContainer.appendChild(newTaskCell);
+  // Set the onclick functions for the checkmark and the delete button
   newTaskCheckmark.onclick = function() {
     // Toggle the "Completed" state for the element
     const taskCell = this.parentElement;
@@ -42,6 +50,14 @@ function createDiv(displayText, fullText) {
     else
       tasks[getTaskIndex(taskCell)].isCompleted = false;
   };
+  newTaskDeleteButton.onclick = function () {
+    // Delete the task from the array
+    let i = getTaskIndex(this.parentElement);
+    tasks.splice(i, 1);
+    // Remove the task cell HTML element
+    this.parentElement.remove();
+  };
+  // Return a reference to the task cell we've created
   return newTaskCell;
 }
 
@@ -54,7 +70,7 @@ addTaskInput.addEventListener("focusout", function() {
   }
 });
 
-// Make the input field lose focus when the Enter key is pressed
+// Make the input field lose focus when Enter key is pressed
 addTaskInput.addEventListener("keydown", function(event) {
   if (event.code === "Enter")
     this.blur();
