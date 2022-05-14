@@ -1,7 +1,7 @@
 var tasks = []; // The array that will hold all task objects
 const addTaskButton = document.getElementById("add-task"); // HTML element for the Add Task button
-const addTaskInput = document.getElementById("task-input"); // HTML element for the input text
-const tasksContainer = document.getElementById("tasks-container"); // A <div> that will contain all the tasks
+const addTaskInput = document.getElementById("task-input"); // HTML element for the text input field
+const tasksContainer = document.getElementById("tasks-container"); // A div that will contain all the tasks
 const maxLength = 35; // Maximum amount of characters to be displayed for each task
 
 function Task(inputText) { // A constructor function for task objects
@@ -13,6 +13,7 @@ function Task(inputText) { // A constructor function for task objects
     this.displayText += "…"; // Add an ellipsis at the end
     } else this.displayText = inputText;
   this.isCompleted = false;
+  this.created = new Date();
   this.htmlElement = createCell(this.displayText, this.fullText);
 }
 
