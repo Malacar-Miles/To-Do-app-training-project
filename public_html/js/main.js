@@ -13,11 +13,18 @@ function Task(inputText) { // A constructor function for task objects
 
 function shorten(inputText) { // If the text is too long to fit the cell, shorten it in a graceful manner
 if (inputText.length > maxLength) {
-    // Turn the string into an array of words, then add words from this array into a new string until maxLength is exceeded
-    inputText = inputText.split(" ").reduce((a, b) => (a.length + b.length <= maxLength) ? a + " " + b : a, "");
-    inputText += "…"; // Add an ellipsis at the end
+    // Turn the string into an array of words
+    let words = inputText.split(" ");
+    //  Keep adding words from this array into a new string until maxLength is exceeded
+    let result = "";
+    for (let i = 0; i < words.length; i++) {
+      if (result.length + words[i].length + 1 <= maxLength)
+        result += " " + words[i];
+      else break;
     }
-return inputText;
+    result += "…"; // Add an ellipsis at the end
+    return result;
+  } else return inputText;
 }
 
 function dateToText(inputDate) { // Turn a date object into a string that will be displayed in the tooltip

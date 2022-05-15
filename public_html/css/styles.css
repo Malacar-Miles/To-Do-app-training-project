@@ -1,7 +1,7 @@
 body {
   margin: 0;
   background-color: black;
-  font-family: Handlee, arial;
+  font-family: 'Handlee', 'Bad Script', arial;
   --color-yellow-page: #f4eb90;
   --color-grey-line: #ccc68a;
   --color-brown-line: #d6a45d;
@@ -36,6 +36,7 @@ hr {
   border: 1px solid var(--color-brown-line);
   border-radius: 1px;
 }
+
 main {
   min-height: 486px;
   background-color: var(--color-yellow-page);
@@ -57,7 +58,7 @@ div.cell {
   user-select: none;
 }
 
-div.task span {
+div.task > span {
   align-self: flex-end;
 }
 
@@ -163,6 +164,4 @@ input#task-input {
 input#task-input:focus {
   background-color: transparent;
   outline: none;
-  border: 1px solid black;
-  border-radius: 4px;
 }
