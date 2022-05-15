@@ -2,7 +2,8 @@ var tasks = []; // The array that will hold all task objects
 const addTaskButton = document.getElementById("add-task"); // HTML element for the Add Task button
 const addTaskInput = document.getElementById("task-input"); // HTML element for the text input field
 const tasksContainer = document.getElementById("tasks-container"); // A div that will contain all the tasks
-const maxLength = 35; // Maximum amount of characters to be displayed for each task
+const maxDisplayLength = 35; // Maximum amount of characters to be displayed for each task
+const maxLength = 200; // Maximum amount of characters that each task can contain
 
 function Task(inputText) { // A constructor function for task objects
   this.fullText = inputText;
@@ -12,13 +13,13 @@ function Task(inputText) { // A constructor function for task objects
 }
 
 function shorten(inputText) { // If the text is too long to fit the cell, shorten it in a graceful manner
-if (inputText.length > maxLength) {
+if (inputText.length > maxDisplayLength) {
     // Turn the string into an array of words
     let words = inputText.split(" ");
-    //  Keep adding words from this array into a new string until maxLength is exceeded
+    //  Keep adding words from this array into a new string until maxDisplayLength is exceeded
     let result = "";
     for (let i = 0; i < words.length; i++) {
-      if (result.length + words[i].length + 1 <= maxLength)
+      if (result.length + words[i].length + 1 <= maxDisplayLength)
         result += " " + words[i];
       else break;
     }

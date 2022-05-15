@@ -159,6 +159,7 @@ input#task-input {
   background-color: transparent;
   border: none;
   align-self: flex-end;
+  padding: 0;
 }
 
 input#task-input:focus {
