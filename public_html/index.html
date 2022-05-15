@@ -15,23 +15,13 @@
       <header><h1>To Be Done</h1></header>
       <main>
         <div id="tasks-container">
-          <!-- 
-          This div gets populated with JavaScript. Uncomment the below code in order to create a sample entry for testing.
-          
-          <div class="cell task"><div class="checkmark"></div>
-              <span class="tooltip">Test displayText…<span class="tooltip-text">
-                Test fullText Lorem ipsum dolor sit amet,
-                consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.
-                Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.
-                Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur.
-                <hr />
-                Created: some date
-              </span></span><div class="delete-button">X</div></div>
+          <!--
+          This div gets populated via JavaScript.
           -->
         </div>
         <div class="cell">
-          <button id="add-task">+</button>
-          <input id="task-input" type="text" size="36" maxlength="200">
+          <button id="add-task" class="circle">+</button>
+          <span id="task-input" class="textarea" role="textbox" contenteditable></span>
         </div>
       </main>
     </div>

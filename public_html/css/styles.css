@@ -5,7 +5,7 @@ body {
   --color-yellow-page: #f4eb90;
   --color-grey-line: #ccc68a;
   --color-brown-line: #d6a45d;
-  --cell-height: 25px;
+  --cell-height: 26px;
   --cell-border: 2px; /* Must be an even number */
   --cell-half-border: calc(var(--cell-border) / 2);
   --cell-total-height: calc(var(--cell-height) + var(--cell-border));
@@ -33,12 +33,14 @@ h1 {
 }
 
 hr {
-  border: 1px solid var(--color-brown-line);
-  border-radius: 1px;
+  border: none;
+  border-top: 2px double var(--color-brown-line);
+  height: 0;
 }
 
 main {
-  min-height: 486px;
+  padding-top: var(--cell-half-border);
+  min-height: calc(var(--cell-total-height) * 15);
   background-color: var(--color-yellow-page);
   /* Draw horizontal cells separated by lines using the colors
   and dimensions set by variables */
@@ -47,37 +49,44 @@ main {
 }
 
 div.cell {
-  padding-top: 1px;
+  position: relative;
   padding-left: 30px;
-  height: var(--cell-total-height);
-  border-top: var(--cell-half-border) solid transparent;
-  border-bottom: var(--cell-half-border) solid transparent;
+  line-height: var(--cell-total-height);
   display: flex;
-  align-items: center;
+  align-items: flex-start;
   filter: var(--text-shadow);
   user-select: none;
 }
 
-div.task > span {
-  align-self: flex-end;
+.textarea {
+  display: inline-block;
+  max-width: 260px;
+  line-height: var(--cell-total-height);
 }
 
-div.checkmark {
-  content: "";
-  display: block;
+.textarea:focus {
+  outline: none;
+}
+
+div.completed > .textarea {
+  text-decoration: line-through;
+}
+
+.circle {
   height: 20px;
   width: 20px;
   border: 1px solid black;
   border-radius: 10px;
+  position: relative;
+  top: 4px;
   display: flex;
   justify-content: center;
   align-items: center;
-  margin-right: 10px;
   cursor: pointer;
 }
 
-div.completed > span {
-  text-decoration: line-through;
+div.checkmark {
+  margin-right: 10px;
 }
 
 div.checkmark p {
@@ -91,14 +100,7 @@ div.completed div.checkmark p {
   visibility: visible;
 }
 
-/* Tooltip container */
-span.tooltip {
-  position: relative;
-  display: inline-block;
-}
-
-/* Tooltip text */
-span.tooltip span.tooltip-text {
+.tooltip {
   visibility: hidden;
   position: absolute;
   z-index: 1;
@@ -109,27 +111,24 @@ span.tooltip span.tooltip-text {
   padding: 5px;
   left: 0;
   right: 0;
-  top: var(--cell-height);
+  top: calc(var(--cell-total-height) + var(--cell-border) * 2);
   margin: 0 auto;
 }
 
 /* Show the tooltip text on mouseover */
-span.tooltip:hover span.tooltip-text {
+.textarea:hover + .tooltip {
   visibility: visible;
 }
 
+/* Hide the tooltip input area is active */
+.textarea:focus + .tooltip {
+  visibility: hidden;
+}
+
 div.delete-button {
-  cursor: pointer;
-  font-size: 10px;
+  font-size: 12px;
   font-weight: bold;
-  border: 1px solid black;
-  width: 20px;
-  height: 20px;
   padding-top: 2px;
-  border-radius: 10px;
-  display: flex;
-  justify-content: center;
-  align-items: center;
   margin-left: 10px;
   visibility: hidden;
 }
@@ -145,24 +144,9 @@ button {
 button#add-task {
   font-weight: bold;
   background-color: transparent;
-  border: 1px solid black;
-  height: 20px;
-  width: 20px;
-  border-radius: 10px;
-  display: flex;
-  justify-content: center;
-  align-items: center;
   margin-right: 10px;
 }
 
-input#task-input {
-  background-color: transparent;
-  border: none;
-  align-self: flex-end;
-  padding: 0;
-}
-
-input#task-input:focus {
-  background-color: transparent;
-  outline: none;
+#task-input {
+  width: 260px;
 }
