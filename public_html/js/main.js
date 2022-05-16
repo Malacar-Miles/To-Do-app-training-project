@@ -1,9 +1,40 @@
 let tasks = []; // The array that will hold all task objects
-const addTaskButton = document.getElementById("add-task"); // HTML element for the Add Task button
-const addTaskInput = document.getElementById("task-input"); // HTML element for the text input field
+const addTaskButton = document.getElementById("add-task"); // DOM element for the Add Task button
+const addTaskInput = document.getElementById("task-input"); // DOM element for the text input field
 const tasksContainer = document.getElementById("tasks-container"); // A div that will contain all the tasks
 const maxDisplayLength = 35; // Maximum amount of characters to be displayed for each task
 const maxLength = 200; // Maximum amount of characters that each task can contain
+const maxCookieAge = 31536000; // Expiration time to set on cookies. 31536000 seconds is 1 year.
+
+// First, let's read the existing tasks data from a cookie file, if it exists
+function populateTasksFromCookie() {
+  
+  // This is a function from w3schools.com that reads a property with a given name from a cookie
+  function getCookie(cname) {
+    let name = cname + "=";
+    let decodedCookie = decodeURIComponent(document.cookie);
+    let ca = decodedCookie.split(';');
+    for(let i = 0; i <ca.length; i++) {
+      let c = ca[i];
+      while (c.charAt(0) == ' ') {
+        c = c.substring(1);
+      }
+      if (c.indexOf(name) == 0) {
+        return c.substring(name.length, c.length);
+      }
+    }
+    return "";
+  }
+  
+  // Read the cookie data and populate the UI
+  let cookieData = getCookie("task-data");
+  if (cookieData.length > 0) {
+    tasks = JSON.parse(cookieData);
+    tasks.forEach(createCell); // Create a DOM element for each task
+  }
+}
+
+populateTasksFromCookie(); // Invoke this function when the page loads
 
 function Task(inputText) { // A constructor function for task objects
   this.fullText = inputText;
@@ -43,14 +74,15 @@ function dateToText(inputDate) { // Turn a date object into a string that will b
   const today = new Date();
   let yesterday = new Date();
   yesterday.setDate(today.getDate() - 1);
-  switch (inputDate.toLocaleString()) {
-    case today.toLocaleString() : result = "Today" + ", " + inputDate.toLocaleTimeString("en-US"); break;
-    case yesterday.toLocaleString() : result = "Yesterday" + ", " + inputDate.toLocaleTimeString("en-US"); break;
+  switch (inputDate.toLocaleDateString()) {
+    case today.toLocaleDateString() : result = "Today" + ", " + inputDate.toLocaleTimeString("en-US"); break;
+    case yesterday.toLocaleDateString() : result = "Yesterday" + ", " + inputDate.toLocaleTimeString("en-US"); break;
     default: result = inputDate.toLocaleDateString("en-US");
   }
   return result;
 }
 
+/* Unused code that I might need later
 function getTaskIndex(element) {
   // Take a reference to a DOM element and find the corresponding index of a task in the global array
   let result = -1;
@@ -61,12 +93,36 @@ function getTaskIndex(element) {
     }
   return result;
 }
+*/
 
 function deleteTask(task) {
   // Remove the DOM element for the task
   task.htmlElement.remove();
   // Remove the task object from the array
   tasks = tasks.filter(element => element !== task);
+  // Update the data in the cookie file
+  updateCookie();
+}
+
+function updateCookie() {
+  // Store the glolbal tasks object in a cookie, overwriting any previous cookie data
+
+  // We don't want to store the htmlElement property so let's create a copy of the tasks array without this property
+  let tasksCopy = tasks.map(task => {
+    // Create an empty object and all properties from the task object (except for htmlElement property) into the new object
+    let taskCopy = {};
+    taskCopy.fullText = task.fullText;
+    taskCopy.displayText = task.displayText;
+    taskCopy.isCompleted = task.isCompleted;
+    taskCopy.created = task.created;
+    return taskCopy;
+  });
+  
+  // Turn the array of objects into a string and encode it
+  let tasksString = JSON.stringify(tasksCopy);
+   
+  // Save this string to a cookie
+  document.cookie = `task-data=${tasksString}; max-age=${maxCookieAge}`;
 }
 
 function createCell(task) {
@@ -82,6 +138,7 @@ function createCell(task) {
   // Set their classes, attributes and innerHTML
   newTaskCell.classList.add("cell");
   newTaskCell.classList.add("task");
+  if (task.isCompleted) newTaskCell.classList.add("completed");
   newTaskDeleteButton.classList.add("circle");
   newTaskDeleteButton.classList.add("delete-button");
   newTaskDeleteButton.innerHTML = "X"; // The letter X is used as a "delete" symbol;
@@ -101,6 +158,12 @@ function createCell(task) {
   newTaskCell.appendChild(newTaskDeleteButton);
   tasksContainer.appendChild(newTaskCell);
   
+  // Add a reference to the DOM element we created into the task object as a property
+  task.htmlElement = newTaskCell;
+  
+  // Populate the tooltip
+  updateTooltip(task);
+  
   // Set event listener functions for the checkmark, text area and delete button
   newTaskCheckmark.addEventListener("click", function() {
     // Toggle "Completed" state for the element
@@ -108,43 +171,39 @@ function createCell(task) {
     taskCell.classList.toggle("completed");
     // Update the isCompleted field in the array item that corresponds to this element
     if (taskCell.classList.contains("completed")) {
-      tasks[getTaskIndex(taskCell)].isCompleted = true;
+      task.isCompleted = true;
       this.nextSibling.removeAttribute("contenteditable"); // Also make the text field non-editable while the task is in "completed" state
     } else {
-      tasks[getTaskIndex(taskCell)].isCompleted = false;
+      task.isCompleted = false;
       this.nextSibling.setAttribute("contenteditable", "");
     }
   });
   
   newTaskText.addEventListener("focusin", function() {
     // When the input field receives focus, replace displayText with fullText
-    let currentTask = tasks[getTaskIndex(this.parentElement)]; // Get the task object from global array
-    this.innerHTML = currentTask.fullText;
+    this.innerHTML = task.fullText;
   });
   
   newTaskText.addEventListener("focusout", function() {
   // Update the task data when the input field loses focus
   let newValue = escapeHTML(this.textContent.trim()); // Remove surrounding spaces from the input text and escape any special characters
-  let currentTask = tasks[getTaskIndex(this.parentElement)];
   if (newValue.length > 0) { // Only do this if the field is not empty
-    currentTask.fullText = newValue; // Update the data in the array
-    currentTask.displayText = shorten(newValue); // Update the data in the array
-    this.innerHTML = currentTask.displayText; // Update the DOM element to display short text instead of the user input
+    task.fullText = newValue; // Update the data in the array
+    task.displayText = shorten(newValue); // Update the data in the array
+    this.innerHTML = task.displayText; // Update the DOM element to display short text instead of the user input
     updateTooltip(task); // Update the tooltip
-  } else deleteTask(currentTask); // If the user fully deleted the text, delete the task
+  } else deleteTask(task); // If the user fully deleted the text, delete the task
+  updateCookie(); // Update the data in the cookie file
   });
   
   newTaskText.addEventListener("keydown", function(event) {
     // Make the input field lose focus when Enter key is pressed
-    if (event.code === "Enter")
+    if (event.code === "Enter" || event.code === "NumpadEnter")
       this.blur();
   });
   
   newTaskDeleteButton.addEventListener("click", function() {
-    // Get the index for the task in the array
-    let i = getTaskIndex(this.parentElement);
-    // Delete the task
-    deleteTask(tasks[i]);
+    deleteTask(task);
   });
   
   // Return a reference to the task cell DOM element we've created
@@ -165,15 +224,15 @@ addTaskInput.addEventListener("focusout", function() {
   if (currentValue.length > 0) { // Only do this if the field is not empty
     this.innerHTML = "";
     const task = new Task(currentValue); // Create a new task
-    task.htmlElement = createCell(task); // Create HTML element for this new task
-    updateTooltip(task); // Populate the tooltip
+    createCell(task); // Create HTML element for this new task
     tasks.push(task); // Add task data to the global array
+    updateCookie(); // Update the data in the cookie file
   }
 });
 
 // Make the input field lose focus when Enter key is pressed
 addTaskInput.addEventListener("keydown", function(event) {
-  if (event.code === "Enter")
+  if (event.code === "Enter" || event.code === "NumpadEnter")
     this.blur();
 });
 
