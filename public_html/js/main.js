@@ -194,6 +194,8 @@ function createCell(task) {
       task.isCompleted = false;
       this.nextSibling.setAttribute("contenteditable", "");
     }
+    // Update the cookie
+    updateCookie();
   });
   
   newTaskText.addEventListener("focusin", function() {
