@@ -30,11 +30,27 @@ function populateTasksFromCookie() {
   let cookieData = getCookie("task-data");
   if (cookieData.length > 0) {
     tasks = JSON.parse(cookieData);
-    tasks.forEach(createCell); // Create a DOM element for each task
+    
+    // For each task, convert the .created property from a JSON string to an object
+    tasks.forEach(task => {
+      task.created = new Date(task.created);
+    });
+    
+    // Create a DOM element for each task
+    tasks.forEach(createCell);
   }
 }
 
-populateTasksFromCookie(); // Invoke this function when the page loads
+// Check if cookies are enabled and display a warning if not
+if (!navigator.cookieEnabled)
+  window.alert("Please enable cookies to prevent losing task data when you close this page.");
+
+// When the page loads, try to load data from cookie
+try {
+  populateTasksFromCookie();
+} catch (error) {
+  console.error(error);
+}
 
 function Task(inputText) { // A constructor function for task objects
   this.fullText = inputText;
@@ -114,7 +130,8 @@ function updateCookie() {
     taskCopy.fullText = task.fullText;
     taskCopy.displayText = task.displayText;
     taskCopy.isCompleted = task.isCompleted;
-    taskCopy.created = task.created;
+    // We have to turn taskCopy.created into a string because otherwise it doesn't get loaded correctly when reading the cookie
+    taskCopy.created = task.created.toString();
     return taskCopy;
   });
   
