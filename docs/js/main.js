@@ -12,15 +12,14 @@ function populateTasksFromCookie() {
   // This is a function from w3schools.com that reads a property with a given name from a cookie
   function getCookie(cname) {
     let name = cname + "=";
-    let decodedCookie = decodeURIComponent(document.cookie);
-    let ca = decodedCookie.split(';');
+    let ca = document.cookie.split(';');
     for(let i = 0; i <ca.length; i++) {
       let c = ca[i];
       while (c.charAt(0) == ' ') {
         c = c.substring(1);
       }
       if (c.indexOf(name) == 0) {
-        return c.substring(name.length, c.length);
+        return decodeURIComponent(c.substring(name.length, c.length));
       }
     }
     return "";
@@ -29,7 +28,11 @@ function populateTasksFromCookie() {
   // Read the cookie data and populate the UI
   let cookieData = getCookie("task-data");
   if (cookieData.length > 0) {
-    tasks = JSON.parse(cookieData);
+    try {tasks = JSON.parse(cookieData);}
+    catch (error) {
+    console.error(error);
+    console.log(cookieData);
+    }
     
     // For each task, convert the .created property from a JSON string to an object
     tasks.forEach(task => {
@@ -127,8 +130,8 @@ function updateCookie() {
   let tasksCopy = tasks.map(task => {
     // Create an empty object and all properties from the task object (except for htmlElement property) into the new object
     let taskCopy = {};
-    taskCopy.fullText = task.fullText;
-    taskCopy.displayText = task.displayText;
+    taskCopy.fullText = encodeURIComponent(task.fullText);
+    taskCopy.displayText = encodeURIComponent(task.displayText);
     taskCopy.isCompleted = task.isCompleted;
     // We have to turn taskCopy.created into a string because otherwise it doesn't get loaded correctly when reading the cookie
     taskCopy.created = task.created.toString();
